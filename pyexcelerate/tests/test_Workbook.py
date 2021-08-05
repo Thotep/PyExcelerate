@@ -2,6 +2,7 @@ import os
 import time
 from datetime import datetime
 
+import openpyxl
 import nose
 import numpy
 from nose.tools import eq_, raises
@@ -178,9 +179,9 @@ def test_multi_save():
 
 def test_number_precision():
     try:
-        import xlrd
+        import openpyxl
     except ImportError:
-        raise nose.SkipTest("xlrd not installed")
+        raise nose.SkipTest("openpyxl not installed")
 
     filename = get_output_path("precision.xlsx")
     sheetname = "Sheet1"
@@ -211,12 +212,12 @@ def test_number_precision():
 
     write_workbook.save(filename)
 
-    read_workbook = xlrd.open_workbook(filename)
-    read_worksheet = read_workbook.sheet_by_name(sheetname)
+    read_workbook = openpyxl.load_workbook(filename)
+    read_worksheet = read_workbook[sheetname]
 
     for row_num in range(len(nums)):
         expected = nums[row_num]
-        got = read_worksheet.cell(row_num, 0).value
+        got = read_worksheet.cell(row=row_num + 1, column=1).value
         eq_(got, expected)
 
     if os.path.exists(filename):

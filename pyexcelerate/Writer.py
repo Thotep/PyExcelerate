@@ -42,7 +42,7 @@ class Writer(object):
         return now.strftime("%Y-%m-%dT%H:%M:00Z")
 
     def save(self, file, **kwargs):
-        zf = ZipFile(file, "w", ZIP_DEFLATED, **kwargs)
+        zf = ZipFile(file, "w", ZIP_DEFLATED, allowZip64=True, **kwargs)
         zf.writestr(
             "docProps/app.xml", self._render_template_wb(self._docProps_app_template)
         )
@@ -77,7 +77,7 @@ class Writer(object):
         for index, sheet in self.workbook.get_xml_data():
             sheetStream = self._worksheet_template.generate({"worksheet": sheet})
             try:
-                with zf.open("xl/worksheets/sheet%s.xml" % (index), mode="w") as f:
+                with zf.open("xl/worksheets/sheet%s.xml" % (index), mode="w", force_zip64=True) as f:
                     for s in sheetStream:
                         f.write(s.encode("utf-8"))
             except RuntimeError:
